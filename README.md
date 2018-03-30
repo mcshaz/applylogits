@@ -4,6 +4,10 @@ Stata ado file to apply multiple covariates and models to risk adjust data
 ### Use
 This is designed for when multiple risk models evolve over time such that covariates are adjusted (either recalibrated or newer models developed), and the values of the covariates are eaily kept track of and appended to in an Excel spreadsheet
 
+### Options
+- debug - wil execute a gen float [x] = ... for each covariate formula supplied (ie each cell under the covariate header *except* intercept), and thereby break down the larger formula to help determine which formula contains a syntax error, or which variable is not of the appropriate Stata type to convert to float
+- or - supplied values ar odds ratios rather than log odds
+
 ### Example
 The Paediatric Index of Mortality (PIM) model has undergone multiple evolutions and recalibrations over time - as detailed in the table below
 
