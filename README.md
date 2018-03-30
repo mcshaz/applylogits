@@ -5,7 +5,7 @@ Stata ado file to apply multiple covariates and models to risk adjust data
 This is designed for when multiple risk models evolve over time such that coefficients are updated (recalibration) or covariates are added/removed, and the values of the coefficients are more eaily kept track of and appended to in an Excel spreadsheet
 
 ### Options
-- debug - wil execute a gen float [x] = ... for each covariate supplied (ie each cell under the covariate header *except* intercept), and thereby break down the larger formula to help determine which formula contains a syntax error, or which variable is not of the appropriate Stata type to convert to float
+- debug - wil execute a gen float [x] = ... for each covariate supplied (i.e. each cell under the covariate header *except* intercept), and thereby break down the larger formula to help determine which formula contains a syntax error, or which variable is not of the appropriate Stata type to convert to float
 - or - supplied values ar odds ratios rather than log odds
 
 ### Example
@@ -36,8 +36,8 @@ pim_uc!=0 | 0 | 1.826 |  |  |  |  |
 planned==1 | 0 | -1.552 |  |  |  |  | 
 intercept |  | -4.873 | -4.8841 | -4.598864 | -1.7928 | -2.299542 | -2.189059
 
-Applylogits requires 1 column named covariate, and an optional column named missing, which is the default value to use if the variable is not present/unknown.
-1 covariate must be named intercept
+Applylogits requires 1 column named covariate, and an optional column named missing, which is the default value to use if the variable is not present/unknown. If there is no missing column, a value of missing generated for any row which contains a missing value.
+1 covariate must be named intercept.
 
 ### use
 ```stata
@@ -58,7 +58,7 @@ which will display the Stata commands as they get executed
     gen float PIM3_2013 = invlogit(0 + 4.371172 * cond(missing(pupils),0,pupils) + -.5164336000000001 * cond(missing(elective),0,elective) + .6634843 * cond(missing(rs_hr124),0,rs_hr124) + .0740947 * cond(missing(be_source,bea),0,cond(inlist(be_source,1,2),abs(bea),0)) + -.0296888 * cond(missing(sbpa),120,sbpa) + .0964949 * cond(missing(sbpa),14.4,sbpa^2/1000) + -1.866951 * cond(missing(bypass),0,inlist(bypass,1,3)) + -1.318171 * cond(missing(cardiac,bypass),0,inlist(cardiac,1,3) & !inlist(bypass,1,3)) + -1.572421 * cond(missing(recovery,cardiac,bypass),0,recovery & !inlist(cardiac,1,3) & !inlist(bypass,1,3)) + 1.993498 * cond(missing(pim3_vhr),0,pim3_vhr!=0) + 1.368355 * cond(missing(pim3_hr),0,pim3_hr!=0) + -2.401701 * cond(missing(pim3_lr),0,pim3_lr!=0) + -2.299542 + .5181944000000001 * cond(missing(fio2a,po2a),.23,100 * fio2a / po2a))
     gen float PIM3_2015 = invlogit(0 + 4.524262 * cond(missing(pupils),0,pupils) + -.3676672 * cond(missing(elective),0,elective) + 1.062791 * cond(missing(rs_hr124),0,rs_hr124) + .0651518 * cond(missing(be_source,bea),0,cond(inlist(be_source,1,2),abs(bea),0)) + -.0359887 * cond(missing(sbpa),120,sbpa) + .1214007 * cond(missing(sbpa),14.4,sbpa^2/1000) + -2.302574 * cond(missing(bypass),0,inlist(bypass,1,3)) + -1.40127 * cond(missing(cardiac,bypass),0,inlist(cardiac,1,3) & !inlist(bypass,1,3)) + -2.040691 * cond(missing(recovery,cardiac,bypass),0,recovery & !inlist(cardiac,1,3) & !inlist(bypass,1,3)) + 2.202997 * cond(missing(pim3_vhr),0,pim3_vhr!=0) + 1.460924 * cond(missing(pim3_hr),0,pim3_hr!=0) + -1.750197 * cond(missing(pim3_lr),0,pim3_lr!=0) + -2.189059 + .2747865 * cond(missing(fio2a,po2a),.23,100 * fio2a / po2a))
 
-these newly created variables can then be used for example to generated SMRs (Standardised Mortality Ratios) - for help on the below user written commands, type 'findit oeratio' in Stata:
+these newly created variables can then be used for example to generated SMRs (Standardised Mortality Ratios):
 
 ```stata
 foreach v of varlist PIM- PIM3_2015 {
@@ -77,7 +77,7 @@ which will give the output
     z = -3.7099991 (< 1st centile)
     PIM2 ...
    
-Ando so on for each of the models in the table above
+Ando so on for each of the models in the table above. *for help on the above user written command, type 'findit oeratio' in Stata*
 
 The data can also be used to generate real time control graphs, such as
 ```stata
