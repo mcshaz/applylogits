@@ -36,7 +36,7 @@ pim_uc!=0 | 0 | 1.826 |  |  |  |  |
 planned==1 | 0 | -1.552 |  |  |  |  | 
 intercept |  | -4.873 | -4.8841 | -4.598864 | -1.7928 | -2.299542 | -2.189059
 
-Applylogits requires 1 column named covariate, and an optional column named missing, which is the default value to use if the variable is not present/unknown. If there is no column with a heading missing, the usual stata behavior is follwed where a missing value for any of the variables used in the formula will generate a value of missing.
+Applylogits requires 1 column named covariate, and an optional column named missing, which is the default value to use if the variable is not present/unknown. If there is no column with a heading 'missing', the usual stata behavior is follwed where a missing value for any of the variables used in the formula will generate a value of missing.
 1 covariate must be named intercept.
 
 ### use
