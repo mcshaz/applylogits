@@ -12,8 +12,9 @@ calculate_pim3 <- function(data, model = "") {
   data <- data |> 
     mutate(across(all_of(c("SBPA","PO2A","FIO2A", "BEA", "BE_SOURCE", "RECOVERY", "BYPASS", "PDX", "PIM3_VHR", "PIM3_HR", "PIM_LR", "PUPILS", "ELECTIVE", "RS_HR124")), as.numeric), .keep = "none") |>
     mutate(across(all_of(c("SBPA","PO2A","FIO2A", "BEA", "BE_SOURCE")), ~na_if(., 999))) |>
-    mutate(across(all_of(c("PUPILS", "SBPA", "RECOVERY", "ELECTIVE", "BYPASS", "RS_HR124", "PIM3_VHR", "PIM3_HR", "PIM_LR")), ~tidyr::replace_na(., 0))) |>
+    mutate(across(all_of(c("PUPILS", "RECOVERY", "ELECTIVE", "BYPASS", "RS_HR124", "PIM3_VHR", "PIM3_HR", "PIM_LR")), ~tidyr::replace_na(., 0))) |>
     mutate(
+      SBPA = tidyr::replace_na(SBPA, 120),
       fp_ratio = coalesce(FIO2A * 100 / PO2A, 0.23),
       BEA =  coalesce(ifelse(BE_SOURCE %in% c(1, 2), BEA, 0), 0),
       Recov_CardBypPr = if_else(RECOVERY==1 & BYPASS %in% c(1, 3) & PDX >= 1900 & PDX <=1999, 1, 0, missing = 0),
