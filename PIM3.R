@@ -16,13 +16,14 @@ calculate_pim3 <- function(data, model = "") {
     mutate(
       SBPA = tidyr::replace_na(SBPA, 120),
       fp_ratio = coalesce(FIO2A * 100 / PO2A, 0.23),
-      BEA =  coalesce(ifelse(BE_SOURCE %in% c(1, 2), BEA, 0), 0),
+      # ANZICS includes BEA if BE_SOURCE = 0 [no base excess available] !!!
+      BEA =  coalesce(ifelse(BE_SOURCE %in% c(0, 1, 2), BEA, 0), 0),
       Recov_CardBypPr = if_else(RECOVERY==1 & BYPASS %in% c(1, 3) & PDX >= 1900 & PDX <=1999, 1, 0, missing = 0),
       Recov_CardNonBypPr = if_else(RECOVERY==1 & BYPASS %in% c(0, 2) & PDX %in% c(1900,1999,1102,1106,1107), 1, 0, missing = 0),
       Recov_NonCardPr = if_else(RECOVERY==1 & (PDX %in% c(1100,1101,1103, 1104, 1105) | (PDX >=1108 & PDX <= 1899)), 1, 0, missing = 0),
       PIM3_VHR = if_else(PIM3_VHR %in% c(0, 6), 0, 1, missing = 0),
-      PIM3_HR = if_else(PIM3_HR %in% c(0, 5), 0, 1, missing = 0),
-      PIM_LR = if_else(PIM_LR > 0, 1, 0, missing = 0))
+      PIM3_HR = if_else(PIM3_HR %in% c(0, 5) | PIM3_VHR == 1, 0, 1, missing = 0),
+      PIM_LR = if_else(PIM_LR > 0 & PIM3_HR == 0 & PIM3_VHR ==0, 1, 0, missing = 0))
   if (model == "anz13") {
     data <- data |> mutate(
       logit = (4.371172 * PUPILS) +
@@ -30,7 +31,7 @@ calculate_pim3 <- function(data, model = "") {
               (0.6634843 * RS_HR124) +
               (0.0740947 * abs(BEA)) + 
               (-0.0296888 * SBPA) +
-              (0.0964949  * ((SBPA^2) / 1000)) +
+              (0.0964949  * (SBPA * SBPA / 1000)) +
               (0.5181944 * fp_ratio) +
               (-1.866951 * Recov_CardBypPr) +
               (-1.318171 * Recov_CardNonBypPr) +
@@ -47,7 +48,7 @@ calculate_pim3 <- function(data, model = "") {
               (1.062791 * RS_HR124) +
               (0.0651518 * abs(BEA)) + 
               (-0.0359887 * SBPA) +
-              (0.1214007 * ((SBPA^2) / 1000)) +
+              (0.1214007 * (SBPA * SBPA / 1000)) +
               (0.2747865 * fp_ratio) +
               (-2.302574 * Recov_CardBypPr) +
               (-1.40127 * Recov_CardNonBypPr) +
@@ -64,7 +65,7 @@ calculate_pim3 <- function(data, model = "") {
               (0.9763 * RS_HR124) +
               (0.0671 * abs(BEA)) + 
               (-0.0431 * SBPA) +
-              (0.1716 * ((SBPA^2) / 1000)) +
+              (0.1716 * (SBPA * SBPA / 1000)) +
               (0.4214 * fp_ratio) +
               (-1.2246 * Recov_CardBypPr) +
               (-0.8762 * Recov_CardNonBypPr) +
